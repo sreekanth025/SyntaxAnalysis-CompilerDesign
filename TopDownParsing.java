@@ -8,6 +8,8 @@ import java.util.*;
  * */
 public class TopDownParsing {
 
+    public static List<List<String>> steps = new ArrayList<>();
+
     public static void main(String[] args) throws Exception {
 
         Map<String, List<String>> input = Utils.readInput("q3.txt");
@@ -19,8 +21,13 @@ public class TopDownParsing {
         System.out.println("");
 
         for(String example: examples) {
+            steps = new ArrayList<>();
+            System.out.println("Checking if '" + example + "' is acceptable by the given grammar: ");
             Boolean result = isAcceptable(input, example);
-            System.out.println(example + " : " + result);
+
+            Collections.reverse(steps);
+            steps.forEach(step -> System.out.printf("%-10s %-2s -> %s\n", step.get(0), step.get(1), step.get(2)));
+            System.out.println("\n" + example + " : " + result + "\n\n");
         }
     }
 
@@ -66,7 +73,7 @@ public class TopDownParsing {
                 }
                 else if (containsTerminal(s)) {
                     NotEpsilonAbleCount++;
-                    notEpsilonAble.add(left);
+//                    notEpsilonAble.add(left);
                     continue;
                 }
                 else {
@@ -79,7 +86,7 @@ public class TopDownParsing {
                         }
                         else if (notEpsilonAble.contains(c.toString())) {
                             NotEpsilonAbleCount++;
-                            notEpsilonAble.add(left);
+//                            notEpsilonAble.add(left);
                             break;
                         }
                     }
@@ -141,6 +148,8 @@ public class TopDownParsing {
                     if(isValid(possible, target, epsilonAble) && !visited.contains(possible)) {
                         visited.add(possible);
                         if(dfs(target, possible, productionRules, visited, epsilonAble)) {
+                            if(s=="") s = "$";
+                            steps.add(new ArrayList<>(Arrays.asList(formed, ch.toString(), s)));
                             return true;
                         }
                     }
@@ -158,8 +167,10 @@ public class TopDownParsing {
     public static Boolean containsTerminal(String s) {
 
         for(Character c: s.toCharArray()) {
-            if('a' <= c && c <= 'z')
+//            if('a' <= c && c <= 'z')
+            if(!isNonTerminal(c))
                 return true;
+
         }
 
         return false;
